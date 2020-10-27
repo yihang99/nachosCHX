@@ -423,6 +423,16 @@ public class KThread {
         }
 	}
 
+    private static class alarmTest implements Runnable {
+        public void run() {
+            long waktTime = 1800;
+            System.out.println("Current Time = "+Machine.timer().getTime());
+            System.out.println("waitUntil("+waktTime+")");
+            ThreadedKernel.alarm.waitUntil(waktTime);
+            System.out.println("Current Time = "+Machine.timer().getTime());
+        }
+	}
+
     public static void joinTest() {
         Lib.debug(dbgThread," Joining to Thread ");
         KThread a = new KThread(new joinTest());
@@ -430,6 +440,12 @@ public class KThread {
         System.out.println("join1");
         a.join();
         System.out.println("join2");
+    }
+
+    public static void alarmTest() {
+        Lib.debug(dbgThread," Joining to Thread ");
+        KThread a = new KThread(new alarmTest());
+        a.setName("newthreadalarm").fork();
     }
 
     /**
@@ -440,7 +456,8 @@ public class KThread {
 	
 	new KThread(new PingTest(1)).setName("forked thread").fork();
 	new PingTest(0).run();
-    KThread.joinTest();
+    //KThread.joinTest();
+    KThread.alarmTest();
     }
 
     private static final char dbgThread = 't';
