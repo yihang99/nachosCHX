@@ -2,6 +2,8 @@ package nachos.threads;
 
 import nachos.machine.*;
 
+import java.util.LinkedList;
+
 /**
  * A <i>communicator</i> allows threads to synchronously exchange 32-bit
  * messages. Multiple threads can be waiting to <i>speak</i>,
@@ -13,7 +15,19 @@ public class Communicator {
     /**
      * Allocate a new communicator.
      */
+    public LinkedList<Integer> waitQueue;
+    public Condition2 speaker, listener;
+    public Lock lock;
+    public int speakerNum, listenerNum;
+
+
     public Communicator() {
+        lock = new Lock();
+        speakerNum = 0;
+        listenerNum = 0;
+        speaker = new Condition2(lock);
+        listener = new Condition2(lock);
+        waitQueue = new LinkedList<Integer>();
     }
 
     /**
@@ -27,6 +41,22 @@ public class Communicator {
      * @param	word	the integer to transfer.
      */
     public void speak(int word) {
+        boolean status1 = Machine.interrupt().disable();
+        lock.acquire();
+        waitQueue.offer(((Integer)word));
+        if(listenerNum>0) {
+            //speakerNum = speakerNum + 1;
+            listener.wake();
+            //listenerNum =  listenerNum - 1;
+        }
+        else {
+            speakerNum = speakerNum + 1;
+            speaker.sleep();
+            speakerNum = speakerNum - 1;
+            //listenerNum =  listenerNum - 1;
+        }
+        lock.release();
+        Machine.interrupt().restore(status1);
     }
 
     /**
@@ -36,6 +66,24 @@ public class Communicator {
      * @return	the integer transferred.
      */    
     public int listen() {
-	return 0;
+        lock.acquire();
+        boolean status1 = Machine.interrupt().disable();
+        int word = 0;
+        if(speakerNum>0) {
+            //listenerNum =  listenerNum + 1;
+            word = waitQueue.poll();
+            speaker.wake();
+            //speakerNum = speakerNum - 1;
+        }
+        else {
+            listenerNum =  listenerNum + 1;
+            listener.sleep();
+            word = waitQueue.poll();
+            listenerNum =  listenerNum - 1;
+            //speakerNum = speakerNum - 1;
+        }
+        lock.release();
+        Machine.interrupt().restore(status1);
+	    return word;
     }
 }

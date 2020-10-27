@@ -433,6 +433,32 @@ public class KThread {
         }
 	}
 
+    private static class speakerTest implements Runnable {
+        public Communicator commun;
+        public int word;
+        public speakerTest(Communicator commun_, int word_) {
+            commun = commun_;
+            word = word_;
+        }
+        public void run() {
+            System.out.println("speak  "+word);
+            commun.speak(word);
+            KThread.yield();
+        }
+	}
+
+    private static class listenerTest implements Runnable {
+        public Communicator commun;
+        public listenerTest(Communicator commun_) {
+            commun = commun_;
+        }
+        public void run() {
+            int word = commun.listen();
+            System.out.println("listen "+word);
+            KThread.yield();
+        }
+	}
+
     public static void joinTest() {
         Lib.debug(dbgThread," Joining to Thread ");
         KThread a = new KThread(new joinTest());
@@ -443,9 +469,27 @@ public class KThread {
     }
 
     public static void alarmTest() {
-        Lib.debug(dbgThread," Joining to Thread ");
+        Lib.debug(dbgThread," Alarm Thread ");
         KThread a = new KThread(new alarmTest());
         a.setName("newthreadalarm").fork();
+    }
+
+    public static void communTest() {
+        Lib.debug(dbgThread," Communicator Thread ");
+        Communicator commun = new Communicator();
+        new KThread(new listenerTest(commun)).setName("newthreadlistener").fork();
+        new KThread(new listenerTest(commun)).setName("newthreadlistener").fork();
+        new KThread(new listenerTest(commun)).setName("newthreadlistener").fork();
+        new KThread(new listenerTest(commun)).setName("newthreadlistener").fork();
+        new KThread(new listenerTest(commun)).setName("newthreadlistener").fork();
+        new KThread(new listenerTest(commun)).setName("newthreadlistener").fork();
+        new KThread(new speakerTest(commun,1)).setName("newthreadspeaker").fork();
+        new KThread(new speakerTest(commun,2)).setName("newthreadspeaker").fork();
+        new KThread(new speakerTest(commun,3)).setName("newthreadspeaker").fork();
+        new KThread(new speakerTest(commun,4)).setName("newthreadspeaker").fork();
+        new KThread(new speakerTest(commun,5)).setName("newthreadspeaker").fork();
+        new KThread(new speakerTest(commun,6)).setName("newthreadspeaker").fork();
+        new KThread(new speakerTest(commun,7)).setName("newthreadspeaker").fork();
     }
 
     /**
@@ -457,7 +501,8 @@ public class KThread {
 	new KThread(new PingTest(1)).setName("forked thread").fork();
 	new PingTest(0).run();
     //KThread.joinTest();
-    KThread.alarmTest();
+    //KThread.alarmTest();
+    KThread.communTest();
     }
 
     private static final char dbgThread = 't';
