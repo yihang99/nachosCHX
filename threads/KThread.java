@@ -459,6 +459,67 @@ public class KThread {
         }
 	}
 
+    public static void pqTest() {
+        Lib.debug(dbgThread," pqTest Thread ");
+        boolean status1 = Machine.interrupt().disable();
+        Lock A = new Lock();
+        Lock B = new Lock();
+        int p = 1;
+        LinkedList<KThread> q = new LinkedList<KThread>();
+        for (int i = 0; i<3; i++) {
+            KThread t = new KThread(new pqTest(A,null,i));
+            t.setName("newthreadpq").fork();
+            q.add(t);
+        }
+        for (int i = 3; i<6; i++) {
+            KThread t = new KThread(new pqTest(null,B,i));
+            t.setName("newthreadpq").fork();
+            q.add(t);
+        }
+        for (int i = 6; i<9; i++) {
+            KThread t = new KThread(new pqTest(A,B,i));
+            t.setName("newthreadpq").fork();
+            q.add(t);
+        }
+        KThread.yield();
+        for (int j=0;j<9;j++) {
+            new PriorityScheduler().setPriority(q.get(j),p);
+            //ThreadedKernel.scheduler.setPriority(q.get(j),p);
+            p = (p+1)%7+1;
+        }
+        Machine.interrupt().restore(status1);
+    }
+    private static class pqTest implements Runnable {
+        int name;
+        Lock a,b;
+        public pqTest(Lock A_, Lock B_, int name_) {
+            a = A_;
+            b = B_;
+            name = name_;
+        }
+        public void run() {
+            System.out.println(name+" starts.");
+            if(b!=null) {
+                System.out.println(name+" waits for Lock a");
+                b.acquire();
+                System.out.println(name+" gets Lock a");
+            }
+            if(a!=null) {
+                System.out.println(name+" waits for Lock b");
+                a.acquire();
+                System.out.println(name+" gets Lock b");
+            }
+            KThread.yield();
+            boolean Status1 = Machine.interrupt().disable();
+            System.out.println(name+" priority = "+ThreadedKernel.scheduler.getEffectivePriority());
+            Machine.interrupt().restore(Status1);
+            KThread.yield();
+            if(b!=null) b.release();
+            if(a!=null) a.release();
+            System.out.println(name+" finishes");
+        }
+	}
+
     public static void joinTest() {
         Lib.debug(dbgThread," Joining to Thread ");
         KThread a = new KThread(new joinTest());
