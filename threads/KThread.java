@@ -502,7 +502,9 @@ public class KThread {
 	new PingTest(0).run();
     //KThread.joinTest();
     //KThread.alarmTest();
-    KThread.communTest();
+    //KThread.communTest();
+    Boat b = new Boat();
+    b.selfTest();
     }
 
     private static final char dbgThread = 't';
