@@ -5,6 +5,7 @@ import nachos.machine.*;
 import java.util.TreeSet;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.lang.Math;
 
 /**
  * A scheduler that chooses threads using a lottery.
@@ -32,6 +33,84 @@ public class LotteryScheduler extends PriorityScheduler {
      */
     public LotteryScheduler() {
     }
+
+    public boolean increasePriority() {
+		boolean intStatus = Machine.interrupt().disable();
+				
+		KThread thread = KThread.currentThread();
+
+		int priority = getPriority(thread);
+
+		setPriority(thread, priority+1);
+
+		Machine.interrupt().restore(intStatus);
+		return true;
+    }
+
+    public boolean decreasePriority() {
+		boolean intStatus = Machine.interrupt().disable();
+				
+		KThread thread = KThread.currentThread();
+
+		int priority = getPriority(thread);
+		if (priority == 1)
+			return false;
+
+		setPriority(thread, priority-1);
+
+		Machine.interrupt().restore(intStatus);
+		return true;
+    }
+
+    protected class LotteryQueue extends PriorityQueue {
+        public LotteryQueue(boolean transferPriority) {
+            super(transferPriority);
+        }
+        protected ThreadState pickNextThread() {
+            if(waitQueue.size()==0)
+				return null;
+			int totalLottery = 0;
+            int index = -10;
+			int size = waitQueue.size();
+			for (int i = 0; i < size; i++) {
+				int pri = getThreadState(waitQueue.get(i)).getEffectivePriority();
+				totalLottery = totalLottery + pri;
+			}
+            int t = Lib.random(totalLottery+1);
+            int sum = 0;
+            for (int i = 0; i < size; i++) {
+				int pri = getThreadState(waitQueue.get(i)).getEffectivePriority();
+				sum  = sum + pri;
+                if(sum>t) {
+                    index = i;
+                    break;
+                }
+			}
+            if(index==-10) {
+                return null;
+            }
+            else {
+                return getThreadState(waitQueue.get(index));
+            }
+		}
+    }
+
+    protected class LotteryThreadState extends ThreadState {
+        public LotteryThreadState(KThread t) {
+            super(t);
+        }
+        public int getEffectivePriority() {
+        			 //Lib.assertTrue(Machine.interrupt().disabled());
+            ef = priority;
+            for(Iterator i = holdQueue.iterator(); i.hasNext();) {
+					for(Iterator j = ((PriorityQueue)i.next()).waitQueue.iterator();j.hasNext();) {
+						int p = getThreadState((KThread)j.next()).priority;
+					    ef= p+ef;
+					}
+			}
+			return ef;
+        }
+    }
     
     /**
      * Allocate a new lottery thread queue.
@@ -43,6 +122,7 @@ public class LotteryScheduler extends PriorityScheduler {
      */
     public ThreadQueue newThreadQueue(boolean transferPriority) {
 	// implement me
-	return null;
+	return new LotteryQueue(transferPriority);
     }
+
 }

@@ -16,7 +16,7 @@ public class Communicator {
      * Allocate a new communicator.
      */
     public LinkedList<Integer> waitQueue;
-    public Condition2 speaker, listener;
+    public Condition speaker, listener;
     public Lock lock;
     public int speakerNum, listenerNum;
 
@@ -25,8 +25,8 @@ public class Communicator {
         lock = new Lock();
         speakerNum = 0;
         listenerNum = 0;
-        speaker = new Condition2(lock);
-        listener = new Condition2(lock);
+        speaker = new Condition(lock);
+        listener = new Condition(lock);
         waitQueue = new LinkedList<Integer>();
     }
 

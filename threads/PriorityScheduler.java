@@ -308,9 +308,7 @@ public class PriorityScheduler extends Scheduler {
     		}
 		}	
 
-		/** The thread with which this object is associated. */	   
 		protected KThread thread;
-		/** The priority of the associated thread. */
 		protected int priority;
 
 		protected LinkedList<nachos.threads.PriorityScheduler.PriorityQueue> holdQueue; 

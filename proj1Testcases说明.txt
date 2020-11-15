@@ -1,0 +1,14 @@
+关于实验testcases的说明：
+
+Task1: We write the testcases in KThread. It is a procedure called joinTest(). In this procedure, a thread "a" is forked. When it is running, it calls a.join(). Two lines are printed before and after the a.join().
+
+Task2: We write the testcases in KThread. It is a procedure called alarmTest().
+The waketime is set to be 1800. Some lines are printed before and after the waitUntil, to check it works.
+
+Task3: This is simple to test. Search for all "Condition" and replace them by "Condition2". If everything works well, it is correct.
+
+Task4: It is in the file KThread. I write two types of threads implementing Runnable. They are called ListenerTest and SpeakerTest. Their behaviour are just to speak or listen something. Besides, there is a procedure communTest(), calling these two kinds of threads. Acutally, it calls 6 listeners and 7 speakers.
+
+Task5: I set 9 threads and 2 locks. Three of them acquiring lock A, three of them acquiring lock B, and the rest acquire both. I set their prioprity to be 1,2,3,4,5,6,7,1,2. They are in the file KThread, and called pqTest(). 
+
+Task6: There are already three testCases in the file Boat. I write one more testCase: begin(5,5,b). To run the testCases, write a procedure in the file KThread, which initializes a case of Boat and sets begin().  

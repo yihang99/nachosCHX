@@ -567,7 +567,7 @@ public class KThread {
     //KThread.joinTest();
     //KThread.alarmTest();
     //KThread.communTest();
-    KThread.pqTest();
+    //KThread.pqTest();
     //Boat b = new Boat();
     //b.selfTest();
     }
