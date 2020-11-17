@@ -1,0 +1,58 @@
+/home/gaodalao/桌面/nachos/mips/bin/mips-gcc -O2 -B/home/gaodalao/桌面/nachos/mips/bin/mips- -G 0 -Wa,-mips1 -nostdlib -ffreestanding -c assert.c
+/home/gaodalao/桌面/nachos/mips/bin/mips-ar rv libnachos.a assert.o
+a - assert.o
+/home/gaodalao/桌面/nachos/mips/bin/mips-gcc -O2 -B/home/gaodalao/桌面/nachos/mips/bin/mips- -G 0 -Wa,-mips1 -nostdlib -ffreestanding -c atoi.c
+/home/gaodalao/桌面/nachos/mips/bin/mips-ar rv libnachos.a atoi.o
+a - atoi.o
+/home/gaodalao/桌面/nachos/mips/bin/mips-gcc -O2 -B/home/gaodalao/桌面/nachos/mips/bin/mips- -G 0 -Wa,-mips1 -nostdlib -ffreestanding -c printf.c
+/home/gaodalao/桌面/nachos/mips/bin/mips-ar rv libnachos.a printf.o
+a - printf.o
+/home/gaodalao/桌面/nachos/mips/bin/mips-gcc -O2 -B/home/gaodalao/桌面/nachos/mips/bin/mips- -G 0 -Wa,-mips1 -nostdlib -ffreestanding -c readline.c
+/home/gaodalao/桌面/nachos/mips/bin/mips-ar rv libnachos.a readline.o
+a - readline.o
+/home/gaodalao/桌面/nachos/mips/bin/mips-gcc -O2 -B/home/gaodalao/桌面/nachos/mips/bin/mips- -G 0 -Wa,-mips1 -nostdlib -ffreestanding -c stdio.c
+/home/gaodalao/桌面/nachos/mips/bin/mips-ar rv libnachos.a stdio.o
+a - stdio.o
+/home/gaodalao/桌面/nachos/mips/bin/mips-gcc -O2 -B/home/gaodalao/桌面/nachos/mips/bin/mips- -G 0 -Wa,-mips1 -nostdlib -ffreestanding -c strncmp.c
+/home/gaodalao/桌面/nachos/mips/bin/mips-ar rv libnachos.a strncmp.o
+a - strncmp.o
+/home/gaodalao/桌面/nachos/mips/bin/mips-gcc -O2 -B/home/gaodalao/桌面/nachos/mips/bin/mips- -G 0 -Wa,-mips1 -nostdlib -ffreestanding -c strcat.c
+/home/gaodalao/桌面/nachos/mips/bin/mips-ar rv libnachos.a strcat.o
+a - strcat.o
+/home/gaodalao/桌面/nachos/mips/bin/mips-gcc -O2 -B/home/gaodalao/桌面/nachos/mips/bin/mips- -G 0 -Wa,-mips1 -nostdlib -ffreestanding -c strcmp.c
+/home/gaodalao/桌面/nachos/mips/bin/mips-ar rv libnachos.a strcmp.o
+a - strcmp.o
+/home/gaodalao/桌面/nachos/mips/bin/mips-gcc -O2 -B/home/gaodalao/桌面/nachos/mips/bin/mips- -G 0 -Wa,-mips1 -nostdlib -ffreestanding -c strcpy.c
+/home/gaodalao/桌面/nachos/mips/bin/mips-ar rv libnachos.a strcpy.o
+a - strcpy.o
+/home/gaodalao/桌面/nachos/mips/bin/mips-gcc -O2 -B/home/gaodalao/桌面/nachos/mips/bin/mips- -G 0 -Wa,-mips1 -nostdlib -ffreestanding -c strlen.c
+/home/gaodalao/桌面/nachos/mips/bin/mips-ar rv libnachos.a strlen.o
+a - strlen.o
+/home/gaodalao/桌面/nachos/mips/bin/mips-gcc -O2 -B/home/gaodalao/桌面/nachos/mips/bin/mips- -G 0 -Wa,-mips1 -nostdlib -ffreestanding -c memcpy.c
+/home/gaodalao/桌面/nachos/mips/bin/mips-ar rv libnachos.a memcpy.o
+a - memcpy.o
+/home/gaodalao/桌面/nachos/mips/bin/mips-gcc -O2 -B/home/gaodalao/桌面/nachos/mips/bin/mips- -G 0 -Wa,-mips1 -nostdlib -ffreestanding -c memset.c
+/home/gaodalao/桌面/nachos/mips/bin/mips-ar rv libnachos.a memset.o
+a - memset.o
+/home/gaodalao/桌面/nachos/mips/bin/mips-cpp  start.s > strt.s
+/home/gaodalao/桌面/nachos/mips/bin/mips-as -mips1 -o start.o strt.s
+rm strt.s
+/home/gaodalao/桌面/nachos/mips/bin/mips-ranlib libnachos.a
+/home/gaodalao/桌面/nachos/mips/bin/mips-gcc -O2 -B/home/gaodalao/桌面/nachos/mips/bin/mips- -G 0 -Wa,-mips1 -nostdlib -ffreestanding -c halt.c
+/home/gaodalao/桌面/nachos/mips/bin/mips-ld -s -T script -N -warn-common -warn-constructors -warn-multiple-gp -o halt.coff halt.o start.o -lnachos
+/home/gaodalao/桌面/nachos/mips/bin/mips-gcc -O2 -B/home/gaodalao/桌面/nachos/mips/bin/mips- -G 0 -Wa,-mips1 -nostdlib -ffreestanding -c sh.c
+/home/gaodalao/桌面/nachos/mips/bin/mips-ld -s -T script -N -warn-common -warn-constructors -warn-multiple-gp -o sh.coff sh.o start.o -lnachos
+/home/gaodalao/桌面/nachos/mips/bin/mips-gcc -O2 -B/home/gaodalao/桌面/nachos/mips/bin/mips- -G 0 -Wa,-mips1 -nostdlib -ffreestanding -c matmult.c
+/home/gaodalao/桌面/nachos/mips/bin/mips-ld -s -T script -N -warn-common -warn-constructors -warn-multiple-gp -o matmult.coff matmult.o start.o -lnachos
+/home/gaodalao/桌面/nachos/mips/bin/mips-gcc -O2 -B/home/gaodalao/桌面/nachos/mips/bin/mips- -G 0 -Wa,-mips1 -nostdlib -ffreestanding -c sort.c
+/home/gaodalao/桌面/nachos/mips/bin/mips-ld -s -T script -N -warn-common -warn-constructors -warn-multiple-gp -o sort.coff sort.o start.o -lnachos
+/home/gaodalao/桌面/nachos/mips/bin/mips-gcc -O2 -B/home/gaodalao/桌面/nachos/mips/bin/mips- -G 0 -Wa,-mips1 -nostdlib -ffreestanding -c echo.c
+/home/gaodalao/桌面/nachos/mips/bin/mips-ld -s -T script -N -warn-common -warn-constructors -warn-multiple-gp -o echo.coff echo.o start.o -lnachos
+/home/gaodalao/桌面/nachos/mips/bin/mips-gcc -O2 -B/home/gaodalao/桌面/nachos/mips/bin/mips- -G 0 -Wa,-mips1 -nostdlib -ffreestanding -c cat.c
+/home/gaodalao/桌面/nachos/mips/bin/mips-ld -s -T script -N -warn-common -warn-constructors -warn-multiple-gp -o cat.coff cat.o start.o -lnachos
+/home/gaodalao/桌面/nachos/mips/bin/mips-gcc -O2 -B/home/gaodalao/桌面/nachos/mips/bin/mips- -G 0 -Wa,-mips1 -nostdlib -ffreestanding -c cp.c
+/home/gaodalao/桌面/nachos/mips/bin/mips-ld -s -T script -N -warn-common -warn-constructors -warn-multiple-gp -o cp.coff cp.o start.o -lnachos
+/home/gaodalao/桌面/nachos/mips/bin/mips-gcc -O2 -B/home/gaodalao/桌面/nachos/mips/bin/mips- -G 0 -Wa,-mips1 -nostdlib -ffreestanding -c mv.c
+/home/gaodalao/桌面/nachos/mips/bin/mips-ld -s -T script -N -warn-common -warn-constructors -warn-multiple-gp -o mv.coff mv.o start.o -lnachos
+/home/gaodalao/桌面/nachos/mips/bin/mips-gcc -O2 -B/home/gaodalao/桌面/nachos/mips/bin/mips- -G 0 -Wa,-mips1 -nostdlib -ffreestanding -c rm.c
+/home/gaodalao/桌面/nachos/mips/bin/mips-ld -s -T script -N -warn-common -warn-constructors -warn-multiple-gp -o rm.coff rm.o start.o -lnachos
