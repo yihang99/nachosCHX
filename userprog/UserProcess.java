@@ -156,37 +156,35 @@ public class UserProcess {
 
 	byte[] memory = Machine.processor().getMemory();
 	
-	// for now, just assume that virtual addresses equal physical addresses
-	if (vaddr < 0 || vaddr >= memory.length)
-	    return 0;
+	// // for now, just assume that virtual addresses equal physical addresses
+	// if (vaddr < 0 || vaddr >= memory.length)
+	//     return 0;
 
-	int amount = Math.min(length, memory.length-vaddr);
-	System.arraycopy(memory, vaddr, data, offset, amount);
-    return amount;
+	// int amount = Math.min(length, memory.length-vaddr);
+	// System.arraycopy(memory, vaddr, data, offset, amount);
+    // return amount;
 
-    // int actualLength = Math.min(length,Math.min(pageSize*numPages-vaddr,data.length-offset));
-    // int totalAmount = 0;
-    // int vpn = vaddr/pageSize;
-    // int vpo = vaddr%pageSize;
-    // int freeLength = data.length-offset;
-    // if(vaddr<0) {
-    //     return 0;
-    // }
-    
-    // int pos1,pos2;
-    // do {
-    //     vpn = Processor.pageFromAddress(vaddr+totalAmount);
-    //     if(vpn<0||vpn>pageTable.length) {
-    //         return 0;
-    //     }
-    //     vpo = Processor.offsetFromAddress(vaddr+totalAmount);
-    //     int amount = Math.min(length-totalAmount,pageSize-vpo);
-    //     pos1=pageTable[vpn].ppn*pageSize+vpo;
-    //     pos2=totalAmount+offset;
-    //     System.arraycopy(memory,pos1,data,pos2,amount);
-    //     totalAmount = totalAmount + amount;
-    // } while(totalAmount<length);
-	// return totalAmount;
+
+    if(vaddr<0) {
+        return 0;
+    }
+    int totalAmount = 0;
+    int vpn, vpo;
+
+    int pos1,pos2;
+    while(totalAmount<length) {
+        vpn = Processor.pageFromAddress(vaddr+totalAmount);
+        vpo = Processor.offsetFromAddress(vaddr+totalAmount);
+        if(vpn<0||vpn>pageTable.length) {
+            return 0;
+        }
+        int copyAmount = Math.min(length-totalAmount,pageSize-vpo);
+        pos1=pageTable[vpn].ppn*pageSize+vpo;
+        pos2=totalAmount+offset;
+        System.arraycopy(memory,pos1,data,pos2,copyAmount);
+        totalAmount += copyAmount;
+    } 
+	return totalAmount;
     }
 
     /**
@@ -222,36 +220,36 @@ public class UserProcess {
 
 	byte[] memory = Machine.processor().getMemory();
 	
-	// for now, just assume that virtual addresses equal physical addresses
-	if (vaddr < 0 || vaddr >= memory.length)
-	    return 0;
+	// // for now, just assume that virtual addresses equal physical addresses
+	// if (vaddr < 0 || vaddr >= memory.length)
+	//     return 0;
 
-	int amount = Math.min(length, memory.length-vaddr);
-	System.arraycopy(data, offset, memory, vaddr, amount);
+	// int amount = Math.min(length, memory.length-vaddr);
+	// System.arraycopy(data, offset, memory, vaddr, amount);
 
-	return amount;
+	// return amount;
 
-    //     int actualLength = Math.min(length,Math.min(pageSize*numPages-vaddr,data.length-offset));
 
-    // int totalAmount = 0;
-    // int vpn = vaddr/pageSize;
-    // int vpo = vaddr%pageSize;
-    // int freeLength = data.length-offset;
-    
-    // int pos1,pos2;
-    // do {
-    //     vpn = Processor.pageFromAddress(vaddr+totalAmount);
-    //     if(vpn<0||vpn>pageTable.length) {
-    //         return 0;
-    //     }
-    //     vpo = Processor.offsetFromAddress(vaddr+totalAmount);
-    //     int amount = Math.min(length-totalAmount,pageSize-vpo);
-    //     pos1=pageTable[vpn].ppn*pageSize+vpo;
-    //     pos2=totalAmount+offset;
-    //     System.arraycopy(amount,pos2,memory,pos1,amount);
-    //     totalAmount = totalAmount + amount;
-    // } while(totalAmount<length);
-	// return totalAmount;
+    if(vaddr<0) {
+        return 0;
+    }
+    int totalAmount = 0;
+    int vpn, vpo;
+
+    int pos1,pos2;
+    while(totalAmount<length) {
+        vpn = Processor.pageFromAddress(vaddr+totalAmount);
+        vpo = Processor.offsetFromAddress(vaddr+totalAmount);
+        if(vpn<0||vpn>pageTable.length) {
+            return 0;
+        }
+        int copyAmount = Math.min(length-totalAmount,pageSize-vpo);
+        pos1=pageTable[vpn].ppn*pageSize+vpo;
+        pos2=totalAmount+offset;
+        System.arraycopy(data,pos2,memory,pos1,copyAmount);
+        totalAmount = totalAmount + copyAmount;
+    } 
+	return totalAmount;
     }
 
     private void finish() {
@@ -370,12 +368,26 @@ public class UserProcess {
      * @return	<tt>true</tt> if the sections were successfully loaded.
      */
     protected boolean loadSections() {
-    UserKernel.memoryLock.acquire();
-	if (numPages > Machine.processor().getNumPhysPages()) {
-	    coff.close();
-	    Lib.debug(dbgProcess, "\tinsufficient physical memory");
-	    return false;
-	}
+    //UserKernel.memoryLock.acquire();
+	// if (numPages > Machine.processor().getNumPhysPages()) {
+	//     coff.close();
+	//     Lib.debug(dbgProcess, "\tinsufficient physical memory");
+	//     return false;
+	// }
+
+    pageTable = new TranslationEntry[numPages];
+    for(int i=0;i<numPages;i++) {
+        int page = UserKernel.allocatePage();
+        if(page<0) {
+            for (int j=0;j<i;j++){
+                UserKernel.freePage(pageTable[i].ppn);
+            }
+            return false;
+        }
+        pageTable[i] = new TranslationEntry(i,page,true,false,false,false);
+    }
+
+    //UserKernel.memoryLock.release();
 
     // load sections
 	for (int s=0; s<coff.getNumSections(); s++) {
@@ -387,33 +399,15 @@ public class UserProcess {
 	    for (int i=0; i<section.getLength(); i++) {
 		int vpn = section.getFirstVPN()+i;
 
-		// for now, just assume virtual addresses=physical addresses
-		section.loadPage(i, vpn);
+		// // for now, just assume virtual addresses=physical addresses
+		// section.loadPage(i, vpn);
+
+        section.loadPage(i, pageTable[vpn].ppn);
 	    }
 	}
 
-    // pageTable = new TranslationEntry[numPages];
-    // for(int i=0;i<numPages;i++) {
-    //     int page = UserKernel.freeMemoryList.remove();
-    //     pageTable[i] = new TranslationEntry(i,page,true,false,false,false);
-    // }
-    // UserKernel.memoryLock.release();
 
-	// // load sections
-	// for (int s=0; s<coff.getNumSections(); s++) {
-	//     CoffSection section = coff.getSection(s);
-	    
-	//     Lib.debug(dbgProcess, "\tinitializing " + section.getName()
-	// 	      + " section (" + section.getLength() + " pages)");
-
-	//     for (int i=0; i<section.getLength(); i++) {
-	// 	int vpn = section.getFirstVPN()+i;
-    //     pageTable[vpn].readOnly = section.isReadOnly();
-
-	// 	// for now, just assume virtual addresses=physical addresses
-	// 	section.loadPage(i, pageTable[vpn].ppn);
-	//     }
-	// }
+    // 
 	
 	return true;
     }
@@ -422,9 +416,9 @@ public class UserProcess {
      * Release any resources allocated by <tt>loadSections()</tt>.
      */
     protected void unloadSections() {
-        // for(int i=0;i<numPages;i++) {
-        //     UserKernel.freePage(pageTable[i].ppn);
-        // }
+        for(int i=0;i<numPages;i++) {
+            UserKernel.freePage(pageTable[i].ppn);
+        }
     }    
 
     /**
@@ -504,7 +498,9 @@ public class UserProcess {
         descriptors[file] = ThreadedKernel.fileSystem.open(addr,false);
         return file;
     }
-
+        // lock.acquire();
+        // joinCondition.sleep();
+        // lock.release();
     private int handleRead3(int file, int buffAddr, int length) {
         if(file<0||file>15||descriptors[file] ==null) {
             return -1;

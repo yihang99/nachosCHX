@@ -2,7 +2,7 @@
 #include "stdlib.h"
 #include "stdio.h"
 #define n 1024
-#define bign 4096
+#define sn 16
 
 char xtl[n];
 
@@ -37,6 +37,30 @@ return 0;
 printf("Success:Read\n");
 close(a);
 unlink("1.txt");
+
+char file1[n]="a.coff";
+char file2[n]="b.coff";
+int args = 0;
+char* argv[sn];
+char x1[]="dasasdas";
+char x2[]="ewqqweqweq";
+char x3[]="fhghghgh";
+char x4[]="uiuiuiuiui";
+char x5[]="nmnmnmnmn";
+argv[0]=x1;
+argv[1]=x2;
+argv[2]=x3;
+argv[3]=x4;
+argv[4]=x5;
+
+int y1=exec(file1,0,argv);
+printf("Success:Execution\n");
+int y2=exec(file2,1,argv);
+int y3;
+int y4=join(y1,&y3);
+printf("Success:Join\n");
+
+
 
 halt();
 return 0;

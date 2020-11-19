@@ -25,17 +25,26 @@ public class UserKernel extends ThreadedKernel {
      */
     public void initialize(String[] args) {
 	super.initialize(args);
-    freeMemoryList = new LinkedList<Integer>();
-    for (int i=0;i<1024;i++) {
-        freeMemoryList.add(i);
-    }
-    memoryLock = new Lock();
+    // freeMemoryList = new LinkedList<Integer>();
+    // for (int i=0;i<1024;i++) {
+    //     freeMemoryList.add(i);
+    // }
+    // memoryLock = new Lock();
 
 	console = new SynchConsole(Machine.console());
 	
 	Machine.processor().setExceptionHandler(new Runnable() {
 		public void run() { exceptionHandler(); }
 	    });
+
+        lock = new Lock();
+        freePages = new LinkedList<Integer>();
+        numPhysPages = Machine.processor().getNumPhysPages();
+        pageStates = new boolean[numPhysPages];
+        for (int i=0;i<numPhysPages;i++) {
+            freePages.add(i);
+            pageStates[i] = false;
+        }
     }
 
     /**
@@ -116,9 +125,33 @@ public class UserKernel extends ThreadedKernel {
 	super.terminate();
     }
 
+    public static int allocatePage() {
+        lock.acquire();
+        if (freePages.size() == 0){
+            return -1;
+        }
+        int ppn = freePages.removeFirst();
+        pageStates[ppn] = true;
+        lock.release();
+        return ppn;
+    }
+
+    public static void freePage(int ppn) {
+        lock.acquire();
+        pageStates[ppn] = false;
+        freePages.add(ppn);
+        lock.release();
+    }
+
     /** Globally accessible reference to the synchronized console. */
     public static SynchConsole console;
 
     // dummy variables to make javac smarter
     private static Coff dummy1 = null;
+
+    // page allocation & free
+    private static LinkedList<Integer> freePages;
+    private static boolean[] pageStates; // false means free
+    private static Lock lock;
+    private static int numPhysPages;
 }
